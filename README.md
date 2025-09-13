@@ -1,4 +1,4 @@
-# Containerized Agents API
+# Containerized AI Agents API
 
 ![IMG](./img/agent_mgr.png)
 
