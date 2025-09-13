@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Containerized Agents Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> Containerized Agents Manager</h1>
+            <div class="status-indicator">
+                <span id="connection-status" class="status-disconnected">Disconnected</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-plus-circle"></i> Create New Agent</h2>
+                </div>
+                <div class="create-agent-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agent-type">Agent Type:</label>
+                            <select id="agent-type">
+                                <option value="coder">Coder</option>
+                                <option value="general">General</option>
+                                <option value="analyzer">Analyzer</option>
+                                <option value="creative">Creative</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="model-name">Model:</label>
+                            <select id="model-name">
+                                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="deployment-name">Deployment Name (Optional):</label>
+                            <input type="text" id="deployment-name" placeholder="e.g., pstestopenaidply-y6ryjn77njxly">
+                        </div>
+                        <div class="form-group">
+                            <label for="template-select">Template (Optional):</label>
+                            <select id="template-select">
+                                <option value="">-- No Template --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <button id="create-agent-btn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Agent
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="custom-prompt">Custom System Prompt (Optional):</label>
+                        <textarea id="custom-prompt" placeholder="Enter a custom system prompt to override the default agent type behavior..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agents List -->
+            <section class="agents-section">
+                <div class="panel-header">
+                    <h2><i class="fas fa-list"></i> Active Agents</h2>
+                    <button id="refresh-agents-btn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div id="agents-list" class="agents-grid">
+                    <!-- Agents will be populated here -->
+                </div>
+            </section>
+
+            <!-- Chat Interface -->
+            <section class="chat-section" id="chat-section" style="display: none;">
+                <div class="panel-header">
+                    <h2><i class="fas fa-comments"></i> Chat with Agent</h2>
+                    <div class="chat-controls">
+                        <span id="current-agent-info"></span>
+                        <button id="close-chat-btn" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Close Chat
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <textarea id="message-input" placeholder="Type your message here..." rows="3"></textarea>
+                        <button id="send-message-btn" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Load configuration first -->
+    <script src="config.js"></script>
+    <!-- Load main application -->
+    <script src="app.js"></script>
+</body>
+</html>

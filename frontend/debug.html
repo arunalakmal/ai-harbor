@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debug - Containerized Agents</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #e2e3e5;
+            border: 1px solid #d6d8db;
+            color: #383d41;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API Debug Tool</h1>
+        <p>Use this tool to test your Containerized Agents API and troubleshoot connection issues.</p>
+
+        <div class="test-section">
+            <h3>0. Azure Connection Test</h3>
+            <button onclick="testAzureConnection()">Test Azure Connection</button>
+            <div id="azure-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Debug Echo Test</h3>
+            <button onclick="testDebugEcho()">Test Debug Echo</button>
+            <div id="debug-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Connection Test</h3>
+            <button onclick="testConnection()">Test API Connection</button>
+            <div id="connection-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Health Check</h3>
+            <button onclick="testHealth()">Check API Health</button>
+            <div id="health-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Templates Test</h3>
+            <button onclick="testTemplates()">Load Templates</button>
+            <div id="templates-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Agent Creation Test</h3>
+            <button onclick="testCreateAgent()">Create Test Agent</button>
+            <div id="create-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Custom Agent Test</h3>
+            <textarea id="custom-prompt" placeholder="Enter custom system prompt (optional)..."></textarea>
+            <br>
+            <button onclick="testCustomAgent()">Create Custom Agent</button>
+            <div id="custom-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>6. List Agents</h3>
+            <button onclick="testListAgents()">List All Agents</button>
+            <div id="list-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+
+        async function apiCall(endpoint, options = {}) {
+            try {
+                console.log(`Making API call to: ${API_BASE_URL}${endpoint}`);
+                console.log('Options:', options);
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                return { response, data };
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        function displayResult(elementId, result, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+            
+            const div = document.createElement('div');
+            div.className = `result ${isError ? 'error' : 'success'}`;
+            div.textContent = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+            element.appendChild(div);
+        }
+
+        function displayError(elementId, error) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+            
+            const div = document.createElement('div');
+            div.className = 'result error';
+            div.textContent = `Error: ${error.message}`;
+            element.appendChild(div);
+        }
+
+        async function testAzureConnection() {
+            try {
+                const { response, data } = await apiCall('/debug/azure-test');
+                displayResult('azure-result', data);
+            } catch (error) {
+                displayError('azure-result', error);
+            }
+        }
+
+        async function testDebugEcho() {
+            try {
+                const testData = {
+                    agent_type: 'creative',
+                    deployment_name: 'pstestopenaidply-y6ryjn77njxly',
+                    model_name: 'gpt-4o-mini',
+                    template: 'frontend_specialist'
+                };
+                
+                console.log('Sending debug echo data:', testData);
+                
+                const { response, data } = await apiCall('/debug/echo', {
+                    method: 'POST',
+                    body: JSON.stringify(testData)
+                });
+                
+                displayResult('debug-result', data);
+            } catch (error) {
+                displayError('debug-result', error);
+            }
+        }
+
+        async function testConnection() {
+            try {
+                const { response, data } = await apiCall('/health');
+                displayResult('connection-result', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                });
+            } catch (error) {
+                displayError('connection-result', error);
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const { response, data } = await apiCall('/health');
+                displayResult('health-result', data);
+            } catch (error) {
+                displayError('health-result', error);
+            }
+        }
+
+        async function testTemplates() {
+            try {
+                const { response, data } = await apiCall('/templates');
+                displayResult('templates-result', data);
+            } catch (error) {
+                displayError('templates-result', error);
+            }
+        }
+
+        async function testCreateAgent() {
+            try {
+                const agentData = {
+                    agent_type: 'creative',
+                    deployment_name: 'pstestopenaidply-y6ryjn77njxly',
+                    model_name: 'gpt-4o-mini',
+                    template: 'frontend_specialist'
+                };
+                
+                console.log('Sending agent data:', agentData);
+                
+                const { response, data } = await apiCall('/agents', {
+                    method: 'POST',
+                    body: JSON.stringify(agentData)
+                });
+                
+                displayResult('create-result', data);
+            } catch (error) {
+                displayError('create-result', error);
+            }
+        }
+
+        async function testCustomAgent() {
+            try {
+                const customPrompt = document.getElementById('custom-prompt').value.trim();
+                
+                const agentData = {
+                    type: 'general',
+                    model: 'gpt-4o-mini'
+                };
+                
+                if (customPrompt) {
+                    agentData.system_prompt = customPrompt;
+                }
+                
+                const { response, data } = await apiCall('/agents', {
+                    method: 'POST',
+                    body: JSON.stringify(agentData)
+                });
+                
+                displayResult('custom-result', data);
+            } catch (error) {
+                displayError('custom-result', error);
+            }
+        }
+
+        async function testListAgents() {
+            try {
+                const { response, data } = await apiCall('/agents');
+                displayResult('list-result', data);
+            } catch (error) {
+                displayError('list-result', error);
+            }
+        }
+
+        // Auto-run connection test on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            testConnection();
+        });
+    </script>
+</body>
+</html>
