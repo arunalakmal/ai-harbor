@@ -1,5 +1,7 @@
 # Containerized Agents API
 
+![IMG](./img/agent_mgr.png)
+
 A Flask-based REST API for managing containerized Azure OpenAI agents. This API allows you to create, delete, list, and chat with containerized AI agents.
 
 ## Prerequisites
